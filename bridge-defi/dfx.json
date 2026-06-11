@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "canisters": {
+    "bridge_defi_frontend": {
+      "type": "assets",
+      "source": ["out"]
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:4943",
+      "type": "ephemeral"
+    },
+    "ic": {
+      "providers": ["https://icp-api.io"],
+      "type": "persistent"
+    }
+  }
+}

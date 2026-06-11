@@ -1,0 +1,29 @@
+// Asset-canister configuration for Bridge.defi.
+// Lives in public/ so Next.js copies it into out/ during static export.
+// Applied by `dfx deploy` when uploading the static assets.
+[
+  {
+    // Long-lived caching for content-hashed Next.js build assets.
+    match: "_next/static/**/*",
+    headers: {
+      "Cache-Control": "public, max-age=31536000, immutable",
+    },
+  },
+  {
+    // Security headers for everything else.
+    //
+    // NOTE: we deliberately do NOT apply the asset canister's "standard"
+    // security_policy. Its CSP pins connect-src to 'self', which would block
+    // the wallet from reaching Internet Identity, the chain RPC endpoints and
+    // the price API. A tailored CSP (allow-listing those origins) is the
+    // correct production hardening step; until then we apply the safe subset
+    // of headers and silence the advisory warning.
+    match: "**/*",
+    headers: {
+      "X-Content-Type-Options": "nosniff",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "X-Frame-Options": "DENY",
+    },
+    disable_security_policy_warning: true,
+  },
+]

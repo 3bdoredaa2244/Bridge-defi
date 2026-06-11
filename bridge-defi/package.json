@@ -8,7 +8,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "export": "next build",
+    "dfx:start": "dfx start --clean --background",
+    "dfx:deploy:local": "next build && dfx deploy --network local",
+    "dfx:deploy:ic": "next build && dfx deploy --network ic"
   },
   "dependencies": {
     "@dfinity/agent": "^2.1.3",
