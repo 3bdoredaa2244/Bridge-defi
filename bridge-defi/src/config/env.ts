@@ -16,6 +16,18 @@ export const env = {
     "NEXT_PUBLIC_MENESE_CANISTER_ID",
     "urs2a-ziaaa-aaaad-aembq-cai",
   ),
+  /**
+   * Bridge.defi's own backend canister — the registered MeneseSDK developer
+   * canister that calls `registerUserForBilling(caller)` on behalf of each
+   * logged-in user. See `backend/BridgeDefiBackend.mo`.
+   *
+   * Empty until the canister is deployed to mainnet and registered via
+   * `registerDeveloperCanister`. While empty, registration is skipped and
+   * MeneseSDK's paid endpoints will trap with "Subscription required".
+   *
+   * This is a canister ID, not a secret — it is public on-chain data.
+   */
+  backendCanisterId: readEnv("NEXT_PUBLIC_BRIDGE_BACKEND_CANISTER_ID", ""),
   icHost: readEnv("NEXT_PUBLIC_IC_HOST", "https://icp0.io"),
   iiProvider: readEnv("NEXT_PUBLIC_II_PROVIDER", "https://identity.ic0.app"),
   priceApiBase: readEnv(

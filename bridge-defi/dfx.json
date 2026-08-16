@@ -4,6 +4,10 @@
     "bridge_defi_frontend": {
       "type": "assets",
       "source": ["out"]
+    },
+    "bridge_defi_backend": {
+      "type": "motoko",
+      "main": "backend/BridgeDefiBackend.mo"
     }
   },
   "networks": {

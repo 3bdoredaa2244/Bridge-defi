@@ -4,15 +4,23 @@
  * that knows the exact `.did` field names, so the rest of the app stays clean.
  */
 import { getMeneseActor, getPrincipalText } from "./actor";
+import { ensureUserRegistered } from "./registration";
+import { classifyError } from "./errors";
 import { isOk } from "./types";
 import type { ChainId } from "@/types/chain";
 import { CHAIN_LIST } from "@/lib/chains/registry";
 
 /** All addresses keyed by ChainId. EVM chains share one derived address. */
 export async function fetchAllAddresses(): Promise<Record<ChainId, string>> {
+  // `getAllAddresses` is a billed endpoint: the principal must be mapped to
+  // this app's subscription first. Memoised — one round-trip per page load.
+  await ensureUserRegistered();
+
   const actor = await getMeneseActor();
   const [a, principal] = await Promise.all([
-    actor.getAllAddresses(),
+    actor.getAllAddresses().catch((err: unknown) => {
+      throw classifyError(err, "canister", "getAllAddresses");
+    }),
     getPrincipalText(),
   ]);
 
@@ -47,8 +55,13 @@ export async function fetchAllAddresses(): Promise<Record<ChainId, string>> {
 export async function fetchCanisterBalances(): Promise<
   Partial<Record<ChainId, bigint>>
 > {
+  // Also a billed endpoint — same registration precondition as addresses.
+  await ensureUserRegistered();
+
   const actor = await getMeneseActor();
-  const b = await actor.getAllBalances();
+  const b = await actor.getAllBalances().catch((err: unknown) => {
+    throw classifyError(err, "canister", "getAllBalances");
+  });
 
   const out: Partial<Record<ChainId, bigint>> = {};
   out.bitcoin = b.bitcoin;
@@ -71,14 +84,23 @@ export async function fetchCanisterBalances(): Promise<
   return out;
 }
 
-/** Quick health-check of the canister (used on the Settings page). */
+/**
+ * Quick health-check of the canister (used on the Settings page).
+ * `health`/`version` are free query calls, so this deliberately does NOT
+ * require registration — it stays usable as a diagnostic when billing is the
+ * very thing that is broken.
+ */
 export async function pingCanister(): Promise<{ health: string; version: string }> {
   const actor = await getMeneseActor();
-  const [health, version] = await Promise.all([
-    actor.health(),
-    actor.version(),
-  ]);
-  return { health, version };
+  try {
+    const [health, version] = await Promise.all([
+      actor.health(),
+      actor.version(),
+    ]);
+    return { health, version };
+  } catch (err) {
+    throw classifyError(err, "canister", "health/version");
+  }
 }
 
 /** Chains we attempt to show a balance for (everything with a price + native unit). */

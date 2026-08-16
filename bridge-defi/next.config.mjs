@@ -25,6 +25,7 @@ const nextConfig = {
     "@dfinity/candid",
     "@dfinity/principal",
   ],
+    turbopack: {},
   webpack: (config) => {
     // The agent libraries reference these node builtins; they are not needed in the browser.
     config.resolve.fallback = {
